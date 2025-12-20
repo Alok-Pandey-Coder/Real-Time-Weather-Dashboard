@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const description = document.getElementById('description');
   const errorMessage = document.getElementById('error-message');
 
-  const API_Key = `a344693683c939b186af89b5c38fd297` // env variable
+  const API_Key =  // Add api key for this
 
   cityInput.addEventListener('keyup', (event) => {
     if(event.key === 'Enter') {
