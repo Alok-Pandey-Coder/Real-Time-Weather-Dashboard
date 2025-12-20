@@ -1,72 +1,66 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const cityInput = document.getElementById("city-input");
-  const getWeatherBtn = document.getElementById("get-weather-btn");
-  const weatherInfo = document.getElementById("weather-info");
-  const cityNameDisplay = document.getElementById("city-name");
-  const temperatureDisplay = document.getElementById("temperature");
-  const descriptionDisplay = document.getElementById("description");
-  const errorMessage = document.getElementById("error-messag");
+document.addEventListener('DOMContentLoaded', () => {
+  const cityInput = document.getElementById('city-input');
+  const getWeatherBtn = document.getElementById('get-weather-btn');
+  const weatherInfo = document.getElementById('weather-info');
+  const cityName = document.getElementById('city-name');
+  const temperature = document.getElementById('temperature');
+  const description = document.getElementById('description');
+  const errorMessage = document.getElementById('error-message');
 
-  const API_KEY = "5f56d525d1619d0a2cd2eac4ce55588e"; //env variables
+  const API_Key = `a344693683c939b186af89b5c38fd297` // env variable
 
-  getWeatherBtn.addEventListener("click", async () => {
-    const city = cityInput.value.trim();
-    if (!city) return;
-
-    // it may throw an error
-    // server/database is always in another continent
-
-    try {
-      const weatherData = await fetchWeatherData(city);
-      displayWeatherData(weatherData);
-    } catch (error) {
-      showError();
+  cityInput.addEventListener('keyup', (event) => {
+    if(event.key === 'Enter') {
+      getWeatherBtn.click();
     }
+  })
+
+  getWeatherBtn.addEventListener('click', async () => {
+    const inputData = cityInput.value.trim();
+    if(!inputData) return;
+
+   try {
+    const data = await fetchWeatherData(inputData);
+    displayWeatherData(data);
+   } catch (error) {
+    showError();
+   }
+
   });
 
   async function fetchWeatherData(city) {
-    //gets the data
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_Key}`;
+    const data = await fetch(url);
 
-    const response = await fetch(url);
-    console.log(typeof response);
-    console.log("RESPONSE", response);
-
-    if (!response.ok) {
-      throw new Error(" City Not found");
+    if(!data.ok) {
+      throw new Error("City not found");
     }
-    const data = await response.json();
-    return data;
+    const response = await data.json();
+    return response;
   }
 
   function displayWeatherData(data) {
-    const { name, main, weather } = data;
-    cityNameDisplay.textContent = name;
-    temperatureDisplay.textContent = `Temperature: ${main.temp}°C`;
-    descriptionDisplay.textContent = `Condition: ${weather[0].description}`;
+    const {name, main, weather} = data;
+    cityName.textContent = name;
+    temperature.textContent = `Temperature : ${main.temp}`;
+    description.textContent = `Weather : ${weather[0].description}`;
+   
 
-    const condition = weather[0].main; 
+    const iconCode = data.weather[0].icon; // Get the code like '10d'
+    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
     
-    document.body.classList.remove("clear-bg", "clouds-bg", "rain-bg");
+    const iconImg = document.getElementById('weather-icon');
+    iconImg.src = iconUrl;
+    
+    weatherInfo.classList.remove('hidden');
+    errorMessage.classList.add('hidden');
 
-    if (condition === "Clear") {
-        document.body.classList.add("clear-bg");
-    } else if (condition === "Clouds") {
-        document.body.classList.add("clouds-bg");
-    } else if (condition === "Rain" || condition === "Drizzle") {
-        document.body.classList.add("rain-bg");
-    } else {
-        document.body.classList.add("default-bg");
-    }
- 
 
-    weatherInfo.classList.remove("hidden");
-    errorMessage.classList.add("hidden");
-}
+  }
 
   function showError() {
-    weatherInfo.classList.remove("hidden");
-    errorMessage.classList.add("hidden");
+    weatherInfo.classList.add('hidden');
+    errorMessage.classList.remove('hidden');
   }
 });
 
